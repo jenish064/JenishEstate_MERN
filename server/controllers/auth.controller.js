@@ -1,14 +1,15 @@
-import express from "express";
 import User from "../dbmodels/user.model.js";
+import bcryptjs from "bcryptjs";
+import { errorHandler } from "../utils/error.js";
 
-export const authAction = async (req, res) => {
+export const signupAction = async (req, res, next) => {
   const { username, email, password } = req.body;
-  const newUser = new User({ username, email, password });
+  const hashedPassword = bcryptjs.hashSync(password, 10);
+  const newUser = new User({ username, email, password: hashedPassword });
   try {
-    console.log("object tooo", req.body);
     await newUser.save();
     res.status(201).json("created the user");
   } catch (error) {
-    res.status(500).json(error.message);
+    next(errorHandler(569, "error created by us!!"));
   }
 };
